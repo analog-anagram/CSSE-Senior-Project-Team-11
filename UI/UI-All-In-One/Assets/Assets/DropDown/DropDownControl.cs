@@ -64,15 +64,11 @@ public class DropDownControl : MonoBehaviour
             }
         }
     }
-
     [Tooltip("The sub item that will be created in the dropdown")]
     public GameObject template;
 
     [Tooltip("The difference in the heights of the item when drawn")]
     public float changeInHeight;
-
-    [Tooltip("The distance from base item and the first item of the dropdown")]
-    public float firstOffset;
 
     [Tooltip("The item that will surround all the items in the dropdown")]
     public GameObject boundingBox;
@@ -102,9 +98,6 @@ public class DropDownControl : MonoBehaviour
     [Tooltip("how long will the gradient transition take for the box")]
     public float BoxFade = 1.0f;
 
-    [Tooltip("delay before holding a button is considered a second input")]
-    public float delay = 0.1f;
-
     [Tooltip("Will the dropdown items use gradient or switch implementation")]
     public bool DropDownItemGradient = true;
 
@@ -113,10 +106,6 @@ public class DropDownControl : MonoBehaviour
 
     [Tooltip("how long will the gradient transition take for the item")]
     public float ItemFade = 1.0f;
-
-    public Color startColor;
-
-    public Color endColor;
 
     [HideInInspector]
     public TextMesh label;
@@ -146,14 +135,8 @@ public class DropDownControl : MonoBehaviour
     float slider = 0;
     GameObject[] scrollingOptions;
     float last_activation = -1;
-    bool cancel = false;
-    private NewButtonScript DropButton;
     void Awake()
     {
-        DropButton = this.GetComponent<NewButtonScript>() as NewButtonScript;
-        DropButton.onPress.AddListener(activate_dropdown);
-        DropButton.setActivatinglayer(activating);
-        DropButton.setHoveringlayer(hovering);
         maxOptionsShown = options.Length;
         this.label = this.GetComponentInChildren<TextMesh>();
         label.text = defaultString;
@@ -200,7 +183,7 @@ public class DropDownControl : MonoBehaviour
         label = this.gameObject.GetComponentInChildren<TextMesh>();
         activated = false;
     }
-    /*
+
     // Update is called once per frame
     void Update()
     {
@@ -240,16 +223,8 @@ public class DropDownControl : MonoBehaviour
             this.GetComponent<Renderer>().material.color = boxGradient.Evaluate(hoverTime);
         }
     }
-    */
     void deactivate_dropdown()
     {
-        print("hammer" + (Time.time - last_activation)+"<"+delay);
-        if (Time.time-last_activation < delay)
-        {
-            last_activation = Time.time;
-            return;
-        }
-        last_activation = Time.time;
         activated = false;
         foreach (Transform t in this.transform)
         {
@@ -258,19 +233,9 @@ public class DropDownControl : MonoBehaviour
                 Destroy(t.gameObject);
             }
         }
-        DropButton.onPress.RemoveListener(deactivate_dropdown);
-        DropButton.onPress.AddListener(activate_dropdown);
     }
     void activate_dropdown()
     {
-        if (Time.time - last_activation < delay)
-        {
-            last_activation = Time.time;
-            return;
-        }
-        last_activation = Time.time;
-        DropButton.onPress.RemoveListener(activate_dropdown);
-        DropButton.onPress.AddListener(deactivate_dropdown);
         if (activated == false && interactable_)
         {
             activated = true;
@@ -286,7 +251,7 @@ public class DropDownControl : MonoBehaviour
             for (int i = 0; i < options.Length; i++)
             {
                 string op = options[i].label;
-                GameObject inst = Instantiate(template, this.transform.position + this.transform.up * ((-i * changeInHeight) - firstOffset), this.transform.rotation);
+                GameObject inst = Instantiate(template, this.transform.position + this.transform.up * -position * changeInHeight, this.transform.rotation);
                 inst.transform.parent = this.transform;
                 Text label = inst.AddComponent<Text>();
                 label.text = op;
@@ -327,24 +292,17 @@ public class DropDownControl : MonoBehaviour
                         }
                     }
                 }
-                GameObject DDinst = inst.gameObject.GetComponentInChildren<Collider>().gameObject;
-                NewButtonScript DDI = DDinst.AddComponent<NewButtonScript>() as NewButtonScript;
+                NewButtonScript DDI = inst.gameObject.GetComponentInChildren<Collider>().gameObject.AddComponent<NewButtonScript>() as NewButtonScript;
                 if (extra != null)
                 {
                     extra.transform.parent = inst.transform;
                 }
-                DDI.gradient = options[i].buttonGrad;
-                DDI.extras = options[i].extras;
-                DDI.extrasHovered = options[i].extrasHovered;
-                DDI.extrasPressed = options[i].extrasPressed;
-                DDI.extrasDisabled = options[i].extrasDisabled;
                 DDI.ItemFade = ItemFade;
                 DDI.setActivatinglayer(activating);
                 DDI.setHoveringlayer(hovering);
                 DDI.extras = extra;
-                int index = i;
-                UnityAction UA = () => closeAndPick(index);
-                DDI.onPress.AddListener(UA);
+                DDI.onHover.AddListener(delegate { closeAndPick(i); });
+                inst.transform.SetParent(this.transform);
                 TextMesh text = inst.GetComponentInChildren<TextMesh>();
                 text.text = op;
                 if (DropDownItemGradient)
@@ -403,7 +361,6 @@ public class DropDownControl : MonoBehaviour
             go.SetActive(true);
         }
     }
-    /*
     void OnTriggerEnter(Collider enter)
     {
         if (interactable_)
@@ -465,7 +422,6 @@ public class DropDownControl : MonoBehaviour
             Hovering = -1;
         }
     }
-    */
     public void closeAndPick(int chosen)
     {
         activated = false;
@@ -484,10 +440,10 @@ public class DropDownControl : MonoBehaviour
     }
     public void setHoveringlayer(LayerMask hovering)
     {
-        DropButton.setHoveringlayer(hovering);
+        this.hovering = hovering;
     }
     public void setActivatinglayer(LayerMask activating)
     {
-        DropButton.setActivatinglayer(activating);
+        this.activating = activating;
     }
 }
