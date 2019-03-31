@@ -37,3 +37,9 @@ If disabled, the extras disabled is placed
 There are 4 states: normal < pressed < hovered < diabled 
 these correspond to the items that are placed each item suppercedes the ones on the left so the system is in 
 the state furthest right that it can be.
+
+Unity Events:
+
+onHover: Called when the dropdown box has an collider stay in it; 
+onEnter: Called when the dropdown box has an collider enter in it; 
+onExit: Called when the dropdown box has an collider exit in it;
