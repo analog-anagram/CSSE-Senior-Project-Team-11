@@ -52,3 +52,12 @@ inspector details:
            If hovered, then Extras Hovered is placed. If disabled, the extras disabled is placed
    There are 4 states: normal < pressed < hovered < diabled these correspond to the items that are placed
        each item suppercedes the ones on the left so the system is in the state furthest right that it can be.
+
+Unity Events:
+
+onValueChange(int): The index of the item that was selected.
+onDropClick: Called when the drop down box is clicked.
+onSelectClick: Called when an item is selected.
+onHover: Called when the dropdown box has an collider stay in it;
+onEnter: Called when the dropdown box has an collider enter in it;
+onExit: Called when the dropdown box has an collider exit in it;
