@@ -31,7 +31,7 @@ public class NewButtonScript : MonoBehaviour
     [Tooltip("The gradient for color changing")]
     public Gradient gradient;
     /// <summary>
-    /// Weather we use the gradient or instant transition
+    /// Weather we use the gradient
     /// </summary>
     [Tooltip("Weather we use the gradient or instant transition")]
     public bool useGradient;
@@ -45,6 +45,11 @@ public class NewButtonScript : MonoBehaviour
     /// </summary>
     [Tooltip("The end color in instant transitions")]
     public Color endColor;
+    /// <summary>
+    /// Weather we use the instant transition
+    /// </summary>
+    [Tooltip("Weather we use the instant transition")]
+    public bool useInstantTransition;
     /// <summary>
     /// The time it takes to get the hovered item to do a fade transition
     /// set to 0 for instant transitions
@@ -175,6 +180,11 @@ public class NewButtonScript : MonoBehaviour
         {
             extra = Instantiate(extras);
         }
+        if(useGradient && useInstantTransition)
+        {
+            Debug.LogError("You can only use one kind of transition, defaulting to Instant transition");
+            useGradient = false;
+        }
     }
     /// <summary>
     /// Update is called once per frame
@@ -233,7 +243,7 @@ public class NewButtonScript : MonoBehaviour
         //update extras
         nextStep();
         //gradient handling
-        if (!useGradient)
+        if (useTransition)
         {
             if (hoverTime == 1) {
                 if (endColor != null)
